@@ -1,7 +1,7 @@
 <?php
 include("globalpath.php");
 
-$getCategory = base64_decode($_GET['cat']);
+$getCategory = base64_decode($_GET['cats']);
 
 if(!empty($getCategory))
 {
