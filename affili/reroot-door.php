@@ -1,12 +1,7 @@
 <?php 
 include 'globalpath.php';
-
-$sqlCatRand = mysql_query('select catName from categories order by rand() limit 1');
-$resultCatRand = mysql_fetch_assoc($sqlCatRand);
-$getRandCat = $resultCatRand['catName'];
-
-
-$sql = @mysql_query("select id, title, imageUrl, price, productUrl from flipkart_products where inStock = 'TRUE' and imageUrl != '' and categories REGEXP '[[:<:]]".$getRandCat."[[:>:]]' limit 30");
+$category = @mysql_real_escape_string($_GET['cat']);
+$sql = @mysql_query('select id, title, imageUrl, price, productUrl from flipkart_products where inStock = \'TRUE\' AND urlCat = "'.$category.'" limit 30');
 $sqlCat = 'select catName, parameter from categories';
 ?>
 <!doctype html>
@@ -20,13 +15,16 @@ $sqlCat = 'select catName, parameter from categories';
 <meta name="description" content="An very basic example of how to use the Wookmark jQuery plug-in.">
 <meta name="author" content="Christoph Ono, Sebastian Helzle">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
-<link rel="stylesheet" href="<?php echo GLOBAL_PATH;?>/css/reset.css">
 <link rel="stylesheet" href="<?php echo GLOBAL_PATH;?>/css/main.css">
+<!--<link rel="stylesheet" href="<?php //echo GLOBAL_PATH;?>/css/main.css">-->
 <link rel="icon" type="image/png" href="<?php echo GLOBAL_PATH;?>/fav/fav.ico">
 </head>
 <body>
 <div class="for_my_pool">
   <div class="for_my_pool_" id="for_flush_p"><img src="<?php echo GLOBAL_PATH;?>/img/menu.png" width="30px" height="30px" border="0" /></div>
+</div>
+<div class="for_my_poolr">
+  <div class="for_my_pool_r" id="for_flush_r"><img src="<?php echo GLOBAL_PATH;?>/img/right.png" width="30px" height="30px" border="0" /></div>
 </div>
 <!-- my pool-->
 <div class="cat_on_oven" id="cat_on_oven_popping">
@@ -56,28 +54,36 @@ while($rowCat = @mysql_fetch_array($resultCat)){
     </tr>
   </table>
 </div>
+<div class="cat_on_oven_r" id="cat_on_oven_popping_r">
+<table width="100%" cellpadding="0" cellspacing="0">
+<tr><td class='selec_pool_r'><a href="#" class="a_tag">About Us</a></td></tr>
+<tr><td class='selec_pool_r'><a href="#" class="a_tag">Terms and Conditions</a></td></tr>
+<tr><td class='selec_pool_r'><a href="#" class="a_tag">Contact Us</a></td></tr>
+</table>
+</div>
 <div id="container">
-  <div class="head_er" onClick="re_flush_array();"><img src="<?php echo GLOBAL_PATH;?>/img/icon4.png" width="60px" height="60px" border="0" /></div>
+  <div class="head_er" onClick="re_flush_array();"><a href="<?php echo GLOBAL_PATH;?>"><img src="<?php echo GLOBAL_PATH;?>/img/icon4.png" width="60px" height="60px" border="0" class="ads"/></a></div>
   <div class="for_filter_mode" onClick="re_flush_array();">
   <form action="#" method="post" id="sort_out" name="sorting_form">
   <div class="for_sort">
-  <select name="for_categories" id="for_categories_sort" class="top_">
+  <select name="for_categories" id="for_categories_sort" class="top_" requirec>
   	<option value="">Select category</option>
   	<?php 
 	$resultCatDD = @mysql_query($sqlCat);
 	while($rowCat = mysql_fetch_array($resultCatDD)){
 	?>
-  	<option value="<?php echo base64_encode($rowCat['catName']);?>"><?php echo stripslashes($rowCat['catName']);?></option>
+  	<option value="<?php echo @base64_encode($rowCat['catName']);?>"><?php echo @stripslashes($rowCat['catName']);?></option>
     <?php }?>
   </select>
   </div><!-- for categories-->
   <div class="for_sort">
   <select name="for_brands" id="for_brands_sort">
-  	<option value="">Select category first</option>
+  	<option value="" id="all_rise_">Brands ( Select a category first )</option>
   </select>
   </div><!-- for brands-->
   <div class="for_sort">
   <select name="for_min_range" id="for_min_range_sort">
+  	<option value="">Min. Price</option>
   	<option value="50">50</option>
     <option value="100">100</option>
     <option value="250">250</option>
@@ -92,6 +98,7 @@ while($rowCat = @mysql_fetch_array($resultCat)){
   </div><!-- for min range-->
   <div class="for_sort">
   <select name="for_max_range" id="for_max_range_sort">
+  	<option value="">Max. Price</option>
   	<option value="100">100</option>
   	<option value="250">250</option>
     <option value="500">500</option>
@@ -109,18 +116,25 @@ while($rowCat = @mysql_fetch_array($resultCat)){
   </div>
   <!--for filter mode--> 
   <div id="main" role="main" onClick="re_flush_array();">
-  <div class="text"><span class="read_">Shopinvilla , Shopping on the go ...</span></div>
+  <div class="text"><span class="read_">Shopinvilla , Shopping on the go</span></div>
+   <div class="text"><span class="read_"><?php echo $category; ?></span></div>
     <ul id="tiles">
       <div class="bug_removed"><img src="<?php echo GLOBAL_PATH;?>/img/load.gif" /></div>
       <!-- These are our grid blocks -->
       <?php
+	    $width = NULL;
 		while($row = @mysql_fetch_array($sql)){
 			$productId = $row['id'];
-			$imageWidth = 200;
+			//list($width, $height) = @getimagesize($row['imageUrl']);//getting image dimension
+			if($width <= 150){
+				$imageWidth = $width;
+			}else{
+				$imageWidth = '200';
+			}
 		?>
       <li>
       <div class="rel"></div>
-      <img src="<?php echo $row['imageUrl']?>" width="<?php echo $imageWidth;?>" height="auto" class="ro" />
+      <img src="<?php echo $row['imageUrl']?>" width="200" />
         <p><?php echo $row['title']?></p>
         <a href="<?php echo $row['productUrl'];?>" target="_blank">
         <div class="buy_n">Buy Now</div>
@@ -143,9 +157,19 @@ while($rowCat = @mysql_fetch_array($resultCat)){
 <script type="text/javascript">
 
 <!-- searchbox js, code starts here-->
-$(function() {
-	$("#for_categories_sort").change(function() {
-		$("#for_brands_sort").load("<?php echo GLOBAL_PATH;?>/ajax_brand.php?cat=" + $("#for_categories_sort").val());
+$(function(){
+	$('#for_categories_sort').change(function(){
+		var ad = $('#for_categories_sort').val();
+		$('#for_brands_sort').html('<option value="">Loading Brands...</option>');
+		$.ajax({
+			type: "POST",
+			url: "http://localhost/shit/ajax_brand.php",
+			data: "club="+ad,
+			cache: false,
+			success: function(mm){
+				$('#for_brands_sort').html(mm);
+			}			
+		});
 	});
 });
 <!-- searchbox js, code ends here-->
@@ -153,30 +177,38 @@ $(function() {
 $('#for_flush_p').click(function(){
 		 //alert('hiiii');
 		 $('#cat_on_oven_popping').toggle();
+		 $('.cat_on_oven_r').css('display','none');
 	 });
 	 function re_flush_array(){
 	$('#cat_on_oven_popping').css('display','none');
+	$('.cat_on_oven_r').css('display','none');
 }
+$('#for_flush_r').click(function(){
+	$('.cat_on_oven_r').toggle();
+	$('#cat_on_oven_popping').css('display','none');
+});
 
-var loading = false;
-$(window).scroll(function(){
-//if($(window).scrollTop() + 1000 >= $(document).height())
-if (!loading && ($(window).scrollTop() >  $(document).height() - $(window).height() - 100))
-			{
-			loading = true;
-			var ID = $('.more').attr("id");
+var process;
+$(document).ready(function(e) {
+    $(document).scroll(function(e){
+		if(process)
+		return false;
+		 if ($(window).scrollTop() >= ($(document).height() - $(window).height())*.7){
+			process = true;
+			var ID = $('.more').attr('id');
 			if(ID)
 			{
 				$.ajax({
 					type: "POST",
-					url: "http://localhost/shit/ajax_more.php",
-					data: "last_id="+ ID, 
+					url: "http://localhost/shit/ajax_more_cat.php",
+					data: "last_id="+ ID + "&cat="<?php echo $category; ?>, 
 					cache: false,
 					success: function(html){
 						$("ul#tiles").append(html);
 						$("#more"+ID).remove();
 						$('#folPosd').fadeOut();
-						loading = false; // reset value of loading once content loaded
+						process = false;
+						
 						}
 					});
 				
@@ -185,40 +217,10 @@ if (!loading && ($(window).scrollTop() >  $(document).height() - $(window).heigh
 			{
 				$(".for_scr_l").html('No More');
 			}
-			return false;
-		}
-		});
-/*$flag = true;
-$(window).scroll(function() {
-	
-   if($(window).scrollTop() + $(window).height() > $(document).height() - 300) {
-	   if($flag == true)
-	   {
-			alert($flag);
 			
-			var ID = $('.more').attr("id");
-			if(ID)
-			{
-				$.ajax({
-					type: "POST",
-					url: "http://localhost/shit/ajax_more.php",
-					data: "last_id="+ ID, 
-					cache: false,
-					success: function(html){
-						$("ul#tiles").append(html);
-						$("#more"+ID).remove();
-						$('#folPosd').fadeOut();
-						}
-					});
-					
-			}
-			
-			$flag = false;
-	   }
-	   else
-	   $flag = false;
-   }
-});*/
+		 }	
+	});	
+});
 </script>
 </body>
 </html>

@@ -34,7 +34,7 @@ RewriteRule ^([^\s%20]+)(?:\s|%20)+([^\s%20]+)((?:\s|%20)+.*)$ $1-$2$3 [N,DPI]
 RewriteRule ^([^\s%20]+)(?:\s|%20)+(.*)$ /$1-$2 [L,R=301,DPI]
 
 # Rewrite rule for category
-#RewriteRule ^([^/]+)/$ reroot-door.php?cat=$1 [NC]
+RewriteRule ^([^/]+)/$ reroot-door.php?cat=$1 [NC]
 
 
 ErrorDocument 404 /404.php

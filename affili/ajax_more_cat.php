@@ -5,7 +5,7 @@ if(isSet($_POST['last_id']))
 {
 $lastId=$_POST['last_id'];
 $category=$_POST['cat'];
-$result = @mysql_query('select id, title, imageUrl, price, productUrl from flipkart_products where id < "'.$lastId.'" AND inStock = \'TRUE\' AND urlCat = "'.$category.'" order by rand() limit 10');
+$result = @mysql_query('select id, title, imageUrl, price, productUrl from flipkart_products where id < "'.$lastId.'" AND inStock = \'TRUE\' AND urlCat = "'.$category.'" limit 10');
 
 $count=mysql_num_rows($result);
 while($row=mysql_fetch_array($result))
@@ -17,8 +17,9 @@ while($row=mysql_fetch_array($result))
 <li>
 	<img src="<?php echo $row['imageUrl']?>" width="200" height="auto"/>
     <p><?php echo $row['title']?></p>
-	<a href="<?php echo $row['productUrl'];?>"><div class="buy_n">Buy Now</div></a>
-	<div class="mrp"><?php echo 'Rs. '.$row['price']?></div>
+	<<a href="<?php echo $row['productUrl'];?>" target="_blank">
+        <div class="buy_n">Buy Now</div>
+        <div class="mrp"><?php echo 'Rs. '.$row['price']?></div></a>
 </li>
 
 
