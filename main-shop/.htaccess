@@ -1,0 +1,89 @@
+Options +FollowSymLinks
+RewriteEngine On
+RewriteBase /shit/
+
+#to open files without .php extensions
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^([^/]+)/$ $1.php
+
+
+#Remove .php and add trailing slash in url
+RewriteCond %{THE_REQUEST} ^GET\ /[^?\s]+\.php
+RewriteRule (.*)\.php$ /shit/$1/ [L,R=301]
+
+#Remove .php/ and add trailing slash in url
+RewriteCond %{THE_REQUEST} ^GET\ /[^?\s]+\.php/
+RewriteRule (.*)\.php/$ /$1/ [L,R=301]
+
+#Remove .html and add trailing slash in url
+RewriteCond %{THE_REQUEST} ^GET\ /[^?\s]+\.html/
+RewriteRule (.*)\.html/$ /$1/ [L,R=301]
+
+# Remove multiple slashes (//) anywhere in URL
+RewriteCond %{REQUEST_URI} ^(.*)//(.*)$
+RewriteRule . %1/%2 [R=301,L]
+
+# Remove multiple hypens (--) anywhere in URL
+RewriteCond %{REQUEST_URI} ^(.*)--(.*)$
+RewriteRule . %1-%2 [R=301,L]
+
+# Add (-) sign when there is a space in url
+RewriteCond %{THE_REQUEST} (\s|%20)
+RewriteRule ^([^\s%20]+)(?:\s|%20)+([^\s%20]+)((?:\s|%20)+.*)$ $1-$2$3 [N,DPI]
+RewriteRule ^([^\s%20]+)(?:\s|%20)+(.*)$ /$1-$2 [L,R=301,DPI]
+
+# Rewrite rule for category
+#RewriteRule ^([^/]+)/$ reroot-door.php?cat=$1 [NC]
+
+
+ErrorDocument 404 /404.php
+
+
+#GZIP Compression starts here
+
+<IfModule mod_deflate.c>
+#The following line is enough for .js and .css
+AddOutputFilter DEFLATE js css
+AddOutputFilterByType DEFLATE text/plain text/xml application/xhtml+xml text/css application/xml application/rss+xml application/atom_xml application/x-javascript application/x-httpd-php application/x-httpd-fastphp text/html
+ 
+#The following lines are to avoid bugs with some browsers
+BrowserMatch ^Mozilla/4 gzip-only-text/html
+BrowserMatch ^Mozilla/4\.0[678] no-gzip
+BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+</IfModule>
+ 
+# BEGIN EXPIRES
+<IfModule mod_expires.c>
+ExpiresActive On
+ExpiresDefault "access plus 10 days"
+ExpiresByType text/css "access plus 1 week"
+ExpiresByType text/plain "access plus 1 month"
+ExpiresByType image/gif "access plus 1 month"
+ExpiresByType image/png "access plus 1 month"
+ExpiresByType image/jpeg "access plus 1 month"
+ExpiresByType application/x-javascript "access plus 1 month"
+ExpiresByType application/javascript "access plus 1 week"
+ExpiresByType application/x-icon "access plus 1 year"
+</IfModule>
+# END EXPIRES
+ 
+<IfModule mod_headers.c>
+<FilesMatch "\.(js|css|xml|gz)$">
+Header append Vary Accept-Encoding
+</FilesMatch>
+<FilesMatch "\.(ico|jpe?g|png|gif|swf)$">
+Header set Cache-Control "public"
+</FilesMatch>
+<FilesMatch "\.(css)$">
+Header set Cache-Control "public"
+</FilesMatch>
+<FilesMatch "\.(js)$">
+Header set Cache-Control "private"
+</FilesMatch>
+<FilesMatch "\.(x?html?|php)$">
+Header set Cache-Control "private, must-revalidate"
+</FilesMatch>
+</IfModule>
+
+#GZIP Compression ends here
